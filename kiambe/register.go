@@ -7,12 +7,13 @@ import (
 	"github.com/ariefdarmawan/kiam"
 	"github.com/ariefdarmawan/kiam/acm"
 	"github.com/ariefdarmawan/kmsg"
-	"github.com/eaciit/toolkit"
+	"github.com/ariefdarmawan/serde"
+	"github.com/sebarcode/codekit"
 )
 
 type RegisterOptions struct {
 	SendNotifTopic string
-	FnPostRegister func(usr *acm.User, parm toolkit.M)
+	FnPostRegister func(usr *acm.User, parm codekit.M)
 	MailFactory    kiam.MailFactory
 }
 
@@ -33,14 +34,14 @@ func NewRegisterEngine(o RegisterOptions) *registerEngine {
 	return r
 }
 
-func (re *registerEngine) Register(ctx *kaos.Context, parm toolkit.M) (string, error) {
+func (re *registerEngine) Register(ctx *kaos.Context, parm codekit.M) (string, error) {
 	h, _ := ctx.DefaultHub()
 	if h == nil {
 		return "", errors.New("invalid data hub")
 	}
 
 	req := new(registerEngine)
-	err := toolkit.Serde(parm, req, "")
+	err := serde.Serde(parm, req)
 	if err != nil {
 		return "", errors.New("fail to register user: " + err.Error())
 	}

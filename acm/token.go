@@ -8,7 +8,7 @@ import (
 	"git.kanosolution.net/kano/dbflex"
 	"git.kanosolution.net/kano/dbflex/orm"
 	"github.com/ariefdarmawan/datahub"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
 )
 
 type Token struct {
@@ -37,7 +37,7 @@ func (g *Token) SetID(keys ...interface{}) {
 }
 
 func CreateToken(h *datahub.Hub, userID, kind string, validDurationInMinute int) (string, error) {
-	token := toolkit.GenerateRandomString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz0123456789", 32)
+	token := codekit.GenerateRandomString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghiklmnopqrstuvwxyz0123456789", 32)
 	tkn := new(Token)
 	tkn.ID = token
 	tkn.UserID = userID

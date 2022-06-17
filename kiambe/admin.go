@@ -6,7 +6,7 @@ import (
 
 	"git.kanosolution.net/kano/kaos"
 	"github.com/ariefdarmawan/kiam/acm"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
 )
 
 type adminEngine struct {
@@ -27,7 +27,7 @@ func (am *adminEngine) SaveUser(ctx *kaos.Context, usr *acm.User) (*acm.User, er
 
 	dbUsr, e := mgr.GetUser("ID", usr.ID)
 	if e != nil && e == io.EOF {
-		dbUsr, e = mgr.CreateUser(usr.LoginID, usr.Name, usr.Email, usr.Phone, toolkit.RandomString(12))
+		dbUsr, e = mgr.CreateUser(usr.LoginID, usr.Name, usr.Email, usr.Phone, codekit.RandomString(12))
 		if e != nil {
 			return nil, e
 		}
@@ -48,8 +48,8 @@ type ChangePasswordRequest struct {
 	ID, Password, ConfirmPassword string
 }
 
-func (am *adminEngine) ChangeUserPassword(ctx *kaos.Context, req *ChangePasswordRequest) (toolkit.M, error) {
-	res := toolkit.M{}
+func (am *adminEngine) ChangeUserPassword(ctx *kaos.Context, req *ChangePasswordRequest) (codekit.M, error) {
+	res := codekit.M{}
 	if req.Password != req.ConfirmPassword {
 		return res, errors.New("password and confirm does not match")
 	}

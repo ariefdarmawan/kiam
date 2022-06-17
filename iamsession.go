@@ -7,14 +7,15 @@ import (
 	"time"
 
 	"git.kanosolution.net/kano/appkit"
-	"github.com/eaciit/toolkit"
 	"github.com/google/uuid"
+	"github.com/sebarcode/codekit"
+	"github.com/sebarcode/logger"
 )
 
 type Session struct {
 	SessionID   string
 	ReferenceID string
-	Data        toolkit.M
+	Data        codekit.M
 	LastUpdate  time.Time
 	Duration    int
 }
@@ -23,13 +24,13 @@ type SessionPool struct {
 	mtx      *sync.RWMutex
 	sessions map[string]*Session
 	refs     map[string]string
-	logger   *toolkit.LogEngine
+	logger   *logger.LogEngine
 
 	CleanUpDuration time.Duration
 	CleanUpCheck    time.Duration
 }
 
-func NewSessionPool(log *toolkit.LogEngine) *SessionPool {
+func NewSessionPool(log *logger.LogEngine) *SessionPool {
 	if log == nil {
 		log = appkit.Log()
 	}
@@ -92,7 +93,7 @@ func (sp *SessionPool) GetByReferenceID(id string) (*Session, bool) {
 	return se, ok
 }
 
-func (sp *SessionPool) Create(referenceID string, data toolkit.M, second int) (*Session, error) {
+func (sp *SessionPool) Create(referenceID string, data codekit.M, second int) (*Session, error) {
 	_, ok := sp.GetByReferenceID(referenceID)
 	if ok {
 		return nil, errors.New("Session already exist")

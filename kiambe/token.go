@@ -6,7 +6,7 @@ import (
 
 	"git.kanosolution.net/kano/kaos"
 	"github.com/ariefdarmawan/kiam/acm"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
 )
 
 type tokenEngine struct {
@@ -17,8 +17,8 @@ func NewTokenEngine() *tokenEngine {
 	return te
 }
 
-func (te *tokenEngine) Claim(ctx *kaos.Context, req toolkit.M) (toolkit.M, error) {
-	res := toolkit.M{}
+func (te *tokenEngine) Claim(ctx *kaos.Context, req codekit.M) (codekit.M, error) {
+	res := codekit.M{}
 	userid := ctx.Data().Get("jwt-reference-id", "").(string)
 
 	h, e := ctx.DefaultHub()

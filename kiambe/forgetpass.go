@@ -9,7 +9,7 @@ import (
 	"github.com/ariefdarmawan/kiam"
 	"github.com/ariefdarmawan/kiam/acm"
 	"github.com/ariefdarmawan/kmsg"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
 )
 
 type ForgetPassOptions struct {
@@ -87,7 +87,7 @@ func (fp *fpass) SendToken(ctx *kaos.Context, email string) (string, error) {
 	return "", nil
 }
 
-func (fp *fpass) ChangePwd(ctx *kaos.Context, req toolkit.M) (string, error) {
+func (fp *fpass) ChangePwd(ctx *kaos.Context, req codekit.M) (string, error) {
 	h, _ := ctx.DefaultHub()
 	if h == nil {
 		return "", errors.New("invalid data hub")

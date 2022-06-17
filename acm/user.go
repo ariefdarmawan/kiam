@@ -7,7 +7,7 @@ import (
 	"git.kanosolution.net/kano/dbflex"
 	dbf "git.kanosolution.net/kano/dbflex"
 	"git.kanosolution.net/kano/dbflex/orm"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -97,7 +97,7 @@ func (m *manager) CreateUser(loginid, name, email, phone, password string) (*Use
 func (mgr *manager) SetPassword(user *User, password string) error {
 	passwd := new(passwrd)
 	passwd.ID = user.ID
-	passwd.Password = toolkit.MD5String(password)
+	passwd.Password = codekit.MD5String(password)
 	return mgr.h.Save(passwd)
 }
 
@@ -110,11 +110,11 @@ func (mgr *manager) ChangePassword(user *User, oldPass, newPass string) error {
 		return err
 	}
 
-	if passwd.Password != toolkit.MD5String(oldPass) {
+	if passwd.Password != codekit.MD5String(oldPass) {
 		return fmt.Errorf("invalid credentials to change password")
 	}
 
-	passwd.Password = toolkit.MD5String(newPass)
+	passwd.Password = codekit.MD5String(newPass)
 	return mgr.h.Save(passwd)
 }
 
@@ -135,7 +135,7 @@ func (mgr *manager) Authenticate(userid string, password string) (string, error)
 		return "", fmt.Errorf("InvalidCredentials2")
 	}
 
-	if passwd.Password != toolkit.MD5String(password) {
+	if passwd.Password != codekit.MD5String(password) {
 		return "", fmt.Errorf("InvalidCredentials3")
 	}
 

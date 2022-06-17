@@ -9,7 +9,7 @@ import (
 	"github.com/ariefdarmawan/kiam"
 	"github.com/ariefdarmawan/kiam/acm"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
 )
 
 type loginEngine struct {
@@ -19,7 +19,7 @@ type loginEngine struct {
 	SecondLifeTime int    `form-show:"hide" grid-show:"hide"`
 
 	im                 *kiam.Manager
-	fnPostAuthenticate func(u *acm.User, m *toolkit.M)
+	fnPostAuthenticate func(u *acm.User, m *codekit.M)
 }
 
 func NewLoginEngine(im *kiam.Manager) *loginEngine {
@@ -28,7 +28,7 @@ func NewLoginEngine(im *kiam.Manager) *loginEngine {
 	return l
 }
 
-func (l *loginEngine) SetFnPostAuthenticate(fn func(u *acm.User, m *toolkit.M)) *loginEngine {
+func (l *loginEngine) SetFnPostAuthenticate(fn func(u *acm.User, m *codekit.M)) *loginEngine {
 	l.fnPostAuthenticate = fn
 	return l
 }
@@ -36,13 +36,13 @@ func (l *loginEngine) SetFnPostAuthenticate(fn func(u *acm.User, m *toolkit.M)) 
 /* need to do:
 taken care of allowed number of multi session, currently has no control on it
 */
-func (l *loginEngine) Authenticate(ctx *kaos.Context, req *loginEngine) (toolkit.M, error) {
+func (l *loginEngine) Authenticate(ctx *kaos.Context, req *loginEngine) (codekit.M, error) {
 	signMtd := l.im.Options().SignMethod
 	signKey := []byte(l.im.Options().SignSecret)
 
 	h, e := ctx.DefaultHub()
 	if e != nil {
-		return toolkit.M{}, errors.New("invalid hub")
+		return codekit.M{}, errors.New("invalid hub")
 	}
 
 	// auth
@@ -54,29 +54,29 @@ func (l *loginEngine) Authenticate(ctx *kaos.Context, req *loginEngine) (toolkit
 		hr := ctx.Data().Get("http-request", new(http.Request)).(*http.Request)
 		loginID, password, ok := hr.BasicAuth()
 		if !ok {
-			return toolkit.M{}, errors.New("unable to get auth info")
+			return codekit.M{}, errors.New("unable to get auth info")
 		}
 		uid, e = mgr.Authenticate(loginID, password)
 		if e != nil {
-			return toolkit.M{}, e
+			return codekit.M{}, e
 		}
 	} else {
 		uid, e = mgr.Authenticate(req.LoginID, req.Password)
 		if e != nil {
-			return toolkit.M{}, e
+			return codekit.M{}, e
 		}
 	}
 
 	usr, _ := mgr.GetUser("ID", uid)
-	tokenData := toolkit.M{}
+	tokenData := codekit.M{}
 	if l.fnPostAuthenticate != nil {
 		l.fnPostAuthenticate(usr, &tokenData)
 	}
 
 	// setup jwt
-	token, err := l.im.FindOrCreate(ctx, toolkit.M{}.Set("ID", uid).Set("Duration", 0), tokenData)
+	token, err := l.im.FindOrCreate(ctx, codekit.M{}.Set("ID", uid).Set("Duration", 0), tokenData)
 	if err != nil {
-		return toolkit.M{}, err
+		return codekit.M{}, err
 	}
 	// jwt-ed
 	secondLifeTime := l.SecondLifeTime
@@ -92,10 +92,10 @@ func (l *loginEngine) Authenticate(ctx *kaos.Context, req *loginEngine) (toolkit
 	jtkn := jwt.NewWithClaims(signMtd, bc)
 	tknString, err := jtkn.SignedString(signKey)
 	if err != nil {
-		return toolkit.M{}, err
+		return codekit.M{}, err
 	}
 
-	res := toolkit.M{}
+	res := codekit.M{}
 	for k, v := range tokenData {
 		res.Set(k, v)
 	}
@@ -103,12 +103,12 @@ func (l *loginEngine) Authenticate(ctx *kaos.Context, req *loginEngine) (toolkit
 	return res, nil
 }
 
-func (l *loginEngine) Logout(ctx *kaos.Context, req toolkit.M) (string, error) {
+func (l *loginEngine) Logout(ctx *kaos.Context, req codekit.M) (string, error) {
 	tokenid := ctx.Data().Get("jwt-token-id", "").(string)
 	if tokenid == "" {
 		return "token not found", nil
 	}
 
-	l.im.Remove(ctx, toolkit.M{}.Set("ID", tokenid))
+	l.im.Remove(ctx, codekit.M{}.Set("ID", tokenid))
 	return "token has been logged-out", nil
 }

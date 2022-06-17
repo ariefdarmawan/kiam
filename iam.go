@@ -5,7 +5,8 @@ import (
 
 	"git.kanosolution.net/kano/kaos"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/eaciit/toolkit"
+	"github.com/sebarcode/codekit"
+	"github.com/sebarcode/logger"
 )
 
 type Options struct {
@@ -23,7 +24,7 @@ type Manager struct {
 	opts           Options
 }
 
-func NewIAM(logger *toolkit.LogEngine, secondLifeTime int, opt *Options) *Manager {
+func NewIAM(logger *logger.LogEngine, secondLifeTime int, opt *Options) *Manager {
 	ae := new(Manager)
 	ae.pool = NewSessionPool(logger)
 	if secondLifeTime == 0 {
@@ -45,7 +46,7 @@ func (m *Manager) Options() Options {
 	return m.opts
 }
 
-func (a *Manager) Get(ctx *kaos.Context, parm toolkit.M) (*Session, error) {
+func (a *Manager) Get(ctx *kaos.Context, parm codekit.M) (*Session, error) {
 	var err error
 	id := parm.GetString("ID")
 	if id == "" {
@@ -76,7 +77,7 @@ func (a *Manager) Get(ctx *kaos.Context, parm toolkit.M) (*Session, error) {
 	return session, nil
 }
 
-func (a *Manager) Create(ctx *kaos.Context, parm toolkit.M) (*Session, error) {
+func (a *Manager) Create(ctx *kaos.Context, parm codekit.M) (*Session, error) {
 	id := parm.GetString("ID")
 	duration := parm.GetInt("Second")
 	if duration == 0 {
@@ -94,7 +95,7 @@ func (a *Manager) Create(ctx *kaos.Context, parm toolkit.M) (*Session, error) {
 	return s, e
 }
 
-func (a *Manager) FindOrCreate(ctx *kaos.Context, parm toolkit.M, data toolkit.M) (*Session, error) {
+func (a *Manager) FindOrCreate(ctx *kaos.Context, parm codekit.M, data codekit.M) (*Session, error) {
 	id := parm.GetString("ID")
 	duration := parm.GetInt("Second")
 	if duration == 0 {
@@ -116,7 +117,7 @@ func (a *Manager) FindOrCreate(ctx *kaos.Context, parm toolkit.M, data toolkit.M
 	return s, nil
 }
 
-func (a *Manager) Renew(ctx *kaos.Context, parm toolkit.M) (*Session, error) {
+func (a *Manager) Renew(ctx *kaos.Context, parm codekit.M) (*Session, error) {
 	id := parm.GetString("ID")
 	duration := parm.GetInt("Second")
 	if id == "" {
@@ -134,7 +135,7 @@ func (a *Manager) Renew(ctx *kaos.Context, parm toolkit.M) (*Session, error) {
 	return se, nil
 }
 
-func (a *Manager) Remove(ctx *kaos.Context, parm toolkit.M) (string, error) {
+func (a *Manager) Remove(ctx *kaos.Context, parm codekit.M) (string, error) {
 	id := parm.GetString("ID")
 
 	se, _ := a.pool.GetBySessionID(id)
